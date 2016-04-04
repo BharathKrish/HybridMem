@@ -13,5 +13,6 @@ CS736 project
 3. Install qemu in the sytem.
 
 4. Boot the freshly made linux with the following command:
-    qemu-system-x86_64 -hda Gentoo-AMD64-root_fs -kernel linux-4.5/arch/x86_64/boot/bzImage -append "root=/dev/sda/ console=ttys0 -mem=512M numa=fake=2" -m 512M -nographic
+   
+   qemu-system-x86_64 -hda Gentoo-AMD64-root_fs -kernel linux-4.5/arch/x86_64/boot/bzImage -append "root=/dev/sda/ console=ttys0 -mem=512M numa=fake=2" -m 512M -nographic
     
