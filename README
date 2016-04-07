@@ -1,0 +1,67 @@
+The program is based on ocean program but I changed the memory allocation for each threads to watch memory usage pattern as time passes. 
+First, there is no shared memory space. Each threads has its own memory space for calculation.
+Second, depending on the thread number, the grid size is vary. 
+	for example, 0 and 4th threads have default grid size.
+		1 and 5th threads doubled from default grid size.
+		2 and 6th threads tripled from default grid size.
+		3 and 7th threads quadrupled from default grid size.
+
+Execution)
+	%> ./ocean_multi 450 10 8  //<grid_size>  <iteration>  <threads>
+
+1. to watch how much memory uses in local computer
+   intall valgrind
+	 %> valgrind --tool=massif ./ocean_multi <grid_size> <iteration> <# of threads>
+	 		The memory usage is analogous to the number of threads and the size of grid.
+	 %> ms_print massif.out.#####   
+			The memory usage will be displayed.
+
+2. upload the file into the kernel.
+	 %> qemu-system-x86_64 -hda Gentoo-AMD64-root_fs -kernel linux-4.5/arch/x86_64/boot/bzImage -append "root=/dev/sda console=ttyS0 -mem=512M numa=fake=2" -m 128M -nographic  
+	 Memory = 128M => each numa nodes has 64MB.
+
+	 On the cae machine, I couldn't find how to mount the image without sudo mode.
+	 So I wrote the all the after booting the kernel using QEMU.
+	 It seems like timer also not working on the QEMU.
+	 
+3. Run the code.
+	 QEMU%> ./ocean_multi 450 10 8
+		=> use 92.31MB of memory at the peak.
+        MB  //memory usage as time passes. Below log is captured from cae machine not QEMU.
+    92.31^::::::#                                                                 
+         |:     #:::::::::::::                                                    
+         |:     #  :          :                                                   
+         |:     #  :          @                                                   
+         |:     #  :          @::::::::                                           
+         |:     #  :          @        :                                          
+         |@     #  :          @        :                                          
+         |@     #  :          @        @@@@@@@@@@@@@@@@@@@@                       
+         |@     #  :          @        @                                          
+         |@     #  :          @        @                                          
+         |@     #  :          @        @                   :                      
+         |@     #  :          @        @                   :                      
+         |@     #  :          @        @                   ::::::                 
+         |@     #  :          @        @                   :                      
+         |@     #  :          @        @                   :     :                
+         |@     #  :          @        @                   :     :::::::::::::::: 
+         |@     #  :          @        @                   :     :                
+         |@     #  :          @        @                   :     :                
+         |@     #  :          @        @                   :     :               :
+         |@     #  :          @        @                   :     :               :
+       0 +----------------------------------------------------------------------->Gi
+         0                                                                   10.86
+4. Watch the /sys/devices/system/node/node0,1/numastat
+		QEMU%> cat /sys/devices/system/node/node0/numastat
+        numa_hit 108819
+        numa_miss 0
+        numa_foreign 36750
+        interleave_hit 750
+        local_node 108819
+        other_node 0
+		QEMU%> cat /sys/devices/system/node/node1/numastat
+        numa_hit 724
+        numa_miss 36750
+        numa_foreign 0
+        interleave_hit 722
+        local_node 0
+        other_node 37474
