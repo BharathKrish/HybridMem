@@ -12,9 +12,9 @@
  *  * Standard in kernel modules 
  *   */
 #include <linux/kernel.h>/* We're doing kernel work */
-#in clude <linux/module.h>/* Specifically, a module */
-#include <linux/pro c_fs.h>/* Necessary because we use the proc fs */
-#include <linux/work    queue.h>/* We scheduale tasks here */
+#include <linux/module.h>/* Specifically, a module */
+#include <linux/proc_fs.h>/* Necessary because we use the proc fs */
+#include <linux/workqueue.h>/* We scheduale tasks here */
 #include <linux/sched.h>/* We n     eed to put ourselves to sleep 
                                            and wake up later */
 #include <linux/init.h>/* For __init and __exit */
