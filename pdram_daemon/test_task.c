@@ -39,7 +39,7 @@ static int die = 0;/* set this to 1 for shutdown */
 static struct workqueue_struct *my_workqueue;
 
 static struct work_struct Task;
-static DECLARE_WORK(Task, intrpt_routine, NULL);
+static DECLARE_WORK(Task, intrpt_routine);
 
 /* 
  *  * This function will be called on every timer interrupt. Notice the void*
