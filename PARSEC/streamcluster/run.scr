@@ -1,0 +1,14 @@
+
+./streamcluster 2 5 1 10000000 200000 500 none output.txt 1
+#./streamcluster 2 5 1 100 10 10 none output.txt 1
+
+# usage: ./streamcluster k1 k2 d n chunksize clustersize infile outfile nproc
+# k1:          Min. number of centers allowed
+# k2:          Max. number of centers allowed
+#  d:           Dimension of each data point
+# chunksize:   Number of data points to handle per step
+# clustersize: Maximum number of intermediate centers
+# infile:      Input file
+# outfile:     Output file
+# nproc:       Number of threads to use
+

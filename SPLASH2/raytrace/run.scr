@@ -1,0 +1,6 @@
+
+#./raytrace -s -p1 -a4 teapot.env
+#./raytrace -s -p1 -a8 teapot.env
+#./raytrace -s -p1 -a2 balls4.env
+./raytrace -s -p1 -a8 balls4.env
+#./raytrace -s -p1 -a128 car.env

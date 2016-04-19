@@ -1,0 +1,7 @@
+
+./canneal 1 20 100 400000.nets 1
+# argument 1 is numthreads
+# argument 2 is the num moves / temp 
+# argument 3 is the start temp
+# argument 4 is the netlist filename
+# argument 5 (optional) is the number of temperature steps before termination

@@ -1,0 +1,7 @@
+
+#p is the number of threads
+#./fft -m16 -p1
+#./fft -m18 -p1
+#./fft -m20 -p1
+./fft -m24 -p1
+#./fft -m28 -p1
