@@ -2,18 +2,21 @@
 #include <linux/module.h>
 #include <linux/workqueue.h>
 #include <linux/slab.h>
+#include <linux/timer.h>
+#include <linux/pdram_metric.h>
+
 
 MODULE_LICENSE("GPL");
 
 static struct workqueue_struct *my_wq;
-
+static struct timer_list my_timer;
 typedef struct {
       struct work_struct my_work;
         int    x;
 } my_work_t;
 
 my_work_t *work, *work2;
-
+void my_timer_callback(void);
 
 static void my_wq_function( struct work_struct *work)
 {
@@ -21,6 +24,15 @@ static void my_wq_function( struct work_struct *work)
       printk( "my_work.x %d\n", my_work->x );
       kfree( (void *)work );
       return;
+}
+
+void my_timer_callback(){
+    int ret;
+     setup_timer(&my_timer, my_timer_callback, 0);
+     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(5000));
+     if(ret) printk("Error in calling the mod_timer again\n");
+     print_pdram_metrics();
+     clear_pdram_metrics();
 }
 
 int init_module( void )
@@ -48,12 +60,20 @@ int init_module( void )
             ret = queue_work( my_wq, (struct work_struct *)work2 );
          }
      }
-         return 0;
+
+     //Setting up the timer.
+
+     setup_timer(&my_timer, my_timer_callback, 0);
+     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(1000));
+     clear_pdram_metrics();
+     print_pdram_metrics();
+     return 0;
 }
 
 void cleanup_module( void )
 {
       flush_workqueue( my_wq );
       destroy_workqueue( my_wq );
+      del_timer(&my_timer);
       return;
 }
