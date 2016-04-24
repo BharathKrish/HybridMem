@@ -4,6 +4,9 @@
 #include <linux/huge_mm.h>
 #include <linux/swap.h>
 
+#include <linux/migrate.h>
+#include <linux/pram.h>
+
 /**
  * page_is_file_cache - should the page be on a file LRU or anon LRU?
  * @page: the page to test
@@ -25,6 +28,7 @@ static inline int page_is_file_cache(struct page *page)
 static __always_inline void add_page_to_lru_list(struct page *page,
 				struct lruvec *lruvec, enum lru_list lru)
 {
+       
 	int nr_pages = hpage_nr_pages(page);
 	mem_cgroup_update_lru_size(lruvec, lru, nr_pages);
 	list_add(&page->lru, &lruvec->lists[lru]);
