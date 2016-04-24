@@ -1,0 +1,1 @@
+cmd_/home/prashanth/cs736/HybridMem/pdram_daemon/prashanth_migrate.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/prashanth/cs736/HybridMem/pdram_daemon/prashanth_migrate.ko /home/prashanth/cs736/HybridMem/pdram_daemon/prashanth_migrate.o /home/prashanth/cs736/HybridMem/pdram_daemon/prashanth_migrate.mod.o

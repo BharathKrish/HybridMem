@@ -40,6 +40,7 @@
 #include <linux/page_idle.h>
 
 #include <asm/tlbflush.h>
+#include <linux/pram.h>
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/migrate.h>
@@ -891,9 +892,9 @@ static int __unmap_and_move(struct page *page, struct page *newpage,
 			TTU_MIGRATION|TTU_IGNORE_MLOCK|TTU_IGNORE_ACCESS);
 		page_was_mapped = 1;
 	}
-
-	if (!page_mapped(page))
+	if (!page_mapped(page)){
 		rc = move_to_new_page(newpage, page, mode);
+        }
 
 	if (page_was_mapped)
 		remove_migration_ptes(page,
@@ -937,7 +938,6 @@ static ICE_noinline int unmap_and_move(new_page_t get_new_page,
 	newpage = get_new_page(page, private, &result);
 	if (!newpage)
 		return -ENOMEM;
-
 	if (page_count(page) == 1) {
 		/* page was freed from under us. So we are done. */
 		goto out;
@@ -1144,6 +1144,9 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
 
 		list_for_each_entry_safe(page, page2, from, lru) {
 			cond_resched();
+                        if (!page_mapped(page)){
+                          printk("Prashanth: Given page is not mapped\n");
+                        }
 
 			if (PageHuge(page))
 				rc = unmap_and_move_huge_page(get_new_page,
@@ -1176,6 +1179,7 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
 		}
 	}
 	nr_failed += retry;
+        printk("Prashanth:migrate returned %d\n",rc);
 	rc = nr_failed;
 out:
 	if (nr_succeeded)
@@ -1201,6 +1205,20 @@ struct page_to_node {
 	int status;
 };
 
+static struct page* alloc_page_pram(struct page* p, unsigned long private, int **result) 
+{
+  struct pram_migrate *pm=(struct pram_migrate*)private;
+  return __alloc_pages_node(pm->node,GFP_ATOMIC|__GFP_THISNODE,0);
+  
+}
+
+int migrate_to_pram(struct list_head *l, enum inactive_type type)
+{
+  enum migrate_reason reason= MR_NUMA_MISPLACED;
+  struct pram_migrate pm= {.node=PRAM_NODE,.type=type};
+  return migrate_pages(l,alloc_page_pram,NULL,(unsigned long)&pm,MIGRATE_SYNC,reason);
+
+}
 static struct page *new_page_node(struct page *p, unsigned long private,
 		int **result)
 {

@@ -54,6 +54,8 @@
 #include <linux/swapops.h>
 #include <linux/balloon_compaction.h>
 #include <linux/pdram_metric.h>
+#include <linux/pram.h>
+#include <linux/migrate.h>
 #include "internal.h"
 
 #define CREATE_TRACE_POINTS
@@ -2186,6 +2188,7 @@ out:
 	}
 }
 
+
 #ifdef CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
 static void init_tlb_ubc(void)
 {
@@ -2203,6 +2206,60 @@ static inline void init_tlb_ubc(void)
 }
 #endif /* CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH */
 
+void wakeup_migrate(void)
+{
+ int nid=DRAM_NODE;
+ int i=0,ret;
+ unsigned long length_inactive;
+ struct zonelist* z_list= NODE_DATA(nid)->node_zonelists;
+ struct zone* zone;
+ enum lru_list lru=LRU_INACTIVE_ANON;
+ struct page *page,*page2;
+ LIST_HEAD(migrate_list); 
+ INIT_LIST_HEAD(&migrate_list);
+ int j;
+ zone = &NODE_DATA(nid)->node_zones[0];
+ for (j=0; j < NODE_DATA(nid)->nr_zones; j++){
+  if(populated_zone(&NODE_DATA(nid)->node_zones[j])){
+    zone = &NODE_DATA(nid)->node_zones[j];
+  }
+ }
+ struct list_head* inactive_head=&zone->lruvec.lists[lru];
+ //printk("Prashanth: Migrating anon pages\n");
+ //struct zoneref* z_ref=first_zones_zonelist(z_list,ZONE_NORMAL,NULL,&zone);
+ //printk("Prashanth:Number of zones in this node is %d\n",zone->zone_pgdat->nr_zones);
+ length_inactive=zone_page_state(zone,NR_INACTIVE_ANON);
+ printk("Prashanth: Length of inactive list is %lu\n",length_inactive);
+ list_for_each_entry_safe_reverse(page2,page,inactive_head,lru) {
+      if (i < length_inactive/2){
+        i++;
+        //printk("Prashanth:is page mapped %d\n",page_mapped(page2));
+        isolate_lru_page(page2);
+        list_add(&page2->lru,&migrate_list);
+      }
+      else
+         break;
+ }
+ if (length_inactive <=1)
+   return;
+ //printk("Prashanth:Number of items is %d\n",i);
+        
+ switch (lru) {
+  case LRU_INACTIVE_ANON:
+      ret=migrate_to_pram(&migrate_list,PRAM_ANON);
+      printk("Prashanth: Could not Migrate %d anon pages\n",ret);
+     break;
+  case LRU_INACTIVE_FILE:
+       ret=migrate_to_pram(&migrate_list,PRAM_FILE);
+       printk("Prashanth: Could not migrate %d file pages\n",ret);
+     break;
+  default:
+     break;
+   }
+}
+EXPORT_SYMBOL(wakeup_migrate);
+ 
+ 
 /*
  * This is a basic per-zone page freer.  Used by both kswapd and direct reclaim.
  */

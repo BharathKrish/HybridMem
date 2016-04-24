@@ -3,7 +3,6 @@
 #include <linux/workqueue.h>
 #include <linux/slab.h>
 #include <linux/timer.h>
-#include <linux/pdram_metric.h>
 #include <linux/migrate.h>
 
 
@@ -65,8 +64,7 @@ int init_module( void )
 
      setup_timer(&my_timer, my_timer_callback, 0);
      ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(1000));
-     clear_pdram_metrics();
-     print_pdram_metrics();
+     wakeup_migrate();
      return 0;
 }
 
