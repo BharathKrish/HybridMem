@@ -108,6 +108,7 @@ static bool __munlock_isolate_lru_page(struct page *page, bool getpage)
 			get_page(page);
 		ClearPageLRU(page);
 		del_page_from_lru_list(page, lruvec, page_lru(page));
+        update_pdram_metrics(4,page_lru(page)); //Page is out of LRU list.
 		return true;
 	}
 

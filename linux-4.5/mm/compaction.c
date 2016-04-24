@@ -17,6 +17,7 @@
 #include <linux/balloon_compaction.h>
 #include <linux/page-isolation.h>
 #include <linux/kasan.h>
+#include <linux/pdram_metric.h>
 #include "internal.h"
 
 #ifdef CONFIG_COMPACTION
@@ -809,7 +810,7 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
 
 		/* Successfully isolated */
 		del_page_from_lru_list(page, lruvec, page_lru(page));
-
+        update_pdram_metrics(4,page_lru(page)); //Delted from list and isolated. So Freed from LRU.
 isolate_success:
 		list_add(&page->lru, migratelist);
 		cc->nr_migratepages++;

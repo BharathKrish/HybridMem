@@ -53,7 +53,7 @@
 
 #include <linux/swapops.h>
 #include <linux/balloon_compaction.h>
-
+#include <linux/pdram_metric.h>
 #include "internal.h"
 
 #define CREATE_TRACE_POINTS
@@ -1209,6 +1209,7 @@ free_it:
 		 * Is there need to periodically free_page_list? It would
 		 * appear not as the counts should be low
 		 */
+        update_pdram_metrics(4,page_off_lru(page));
 		list_add(&page->lru, &free_pages);
 		continue;
 
@@ -1455,6 +1456,7 @@ int isolate_lru_page(struct page *page)
 			int lru = page_lru(page);
 			get_page(page);
 			ClearPageLRU(page);
+            update_pdram_metrics(4,lru); //Out of LRU list. Is isolated. But still in the same RAM.
 			del_page_from_lru_list(page, lruvec, lru);
 			ret = 0;
 		}
@@ -1528,7 +1530,7 @@ putback_inactive_pages(struct lruvec *lruvec, struct list_head *page_list)
 		SetPageLRU(page);
 		lru = page_lru(page);
 		add_page_to_lru_list(page, lruvec, lru);
-
+        update_pdram_metrics(0,lru); //Being added to the inactive list.
 		if (is_active_lru(lru)) {
 			int file = is_file_lru(lru);
 			int numpages = hpage_nr_pages(page);
@@ -1538,7 +1540,7 @@ putback_inactive_pages(struct lruvec *lruvec, struct list_head *page_list)
 			__ClearPageLRU(page);
 			__ClearPageActive(page);
 			del_page_from_lru_list(page, lruvec, lru);
-
+            update_pdram_metrics(4,lru);
 			if (unlikely(PageCompound(page))) {
 				spin_unlock_irq(&zone->lru_lock);
 				mem_cgroup_uncharge(page);
@@ -1711,6 +1713,7 @@ shrink_inactive_list(unsigned long nr_to_scan, struct lruvec *lruvec,
 
 	trace_mm_vmscan_lru_shrink_inactive(zone, nr_scanned, nr_reclaimed,
 			sc->priority, file);
+    printk("calling shrink_inactive.\n");
 	return nr_reclaimed;
 }
 
@@ -1748,17 +1751,17 @@ static void move_active_pages_to_lru(struct lruvec *lruvec,
 
 		VM_BUG_ON_PAGE(PageLRU(page), page);
 		SetPageLRU(page);
-
+        printk("Being moved to the inactive list\n");
 		nr_pages = hpage_nr_pages(page);
 		mem_cgroup_update_lru_size(lruvec, lru, nr_pages);
 		list_move(&page->lru, &lruvec->lists[lru]);
 		pgmoved += nr_pages;
-
+        update_pdram_metrics(0,lru); //Being moved to the inactive list.
 		if (put_page_testzero(page)) {
 			__ClearPageLRU(page);
 			__ClearPageActive(page);
 			del_page_from_lru_list(page, lruvec, lru);
-
+            update_pdram_metrics(4,lru);
 			if (unlikely(PageCompound(page))) {
 				spin_unlock_irq(&zone->lru_lock);
 				mem_cgroup_uncharge(page);
@@ -1844,12 +1847,14 @@ static void shrink_active_list(unsigned long nr_to_scan,
 			 */
 			if ((vm_flags & VM_EXEC) && page_is_file_cache(page)) {
 				list_add(&page->lru, &l_active);
+                update_pdram_metrics(2,lru);
 				continue;
 			}
 		}
 
 		ClearPageActive(page);	/* we are de-activating */
 		list_add(&page->lru, &l_inactive);
+        update_pdram_metrics(0,lru);
 	}
 
 	/*
@@ -1868,7 +1873,7 @@ static void shrink_active_list(unsigned long nr_to_scan,
 	move_active_pages_to_lru(lruvec, &l_inactive, &l_hold, lru - LRU_ACTIVE);
 	__mod_zone_page_state(zone, NR_ISOLATED_ANON + file, -nr_taken);
 	spin_unlock_irq(&zone->lru_lock);
-
+    printk("Calling shrink_active list.\n");
 	mem_cgroup_uncharge_list(&l_hold);
 	free_hot_cold_page_list(&l_hold, true);
 }
@@ -3901,6 +3906,7 @@ void check_move_unevictable_pages(struct page **pages, int nr_pages)
 			ClearPageUnevictable(page);
 			del_page_from_lru_list(page, lruvec, LRU_UNEVICTABLE);
 			add_page_to_lru_list(page, lruvec, lru);
+            update_pdram_metrics(1,lru);//Being added to lru list. Could be active or inactive list.
 			pgrescued++;
 		}
 	}
