@@ -30,9 +30,9 @@ static void my_wq_function( struct work_struct *work)
 void my_timer_callback(){
     int ret;
      setup_timer(&my_timer, my_timer_callback, 0);
-     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(5000));
+     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(10000));
      if(ret) printk("Error in calling the mod_timer again\n");
-     wakeup_migrate();
+     scan_lists();
 }
 
 int init_module( void )
@@ -65,8 +65,6 @@ int init_module( void )
 
      setup_timer(&my_timer, my_timer_callback, 0);
      ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(1000));
-     clear_pdram_metrics();
-     print_pdram_metrics();
      return 0;
 }
 
