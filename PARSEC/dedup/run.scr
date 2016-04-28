@@ -1,6 +1,6 @@
 
 #./dedup -c -p -v -t 1 -i test.dat -o output.dat.ddp
 #./dedup -c -p -v -t 1 -i hamlet.dat -o output.dat.ddp
-#./dedup -c -p -v -t 1 -i media_small.dat -o output.dat.ddp
-./dedup -c -p -v -t 1 -i media_medium.dat -o output.dat.ddp
+./dedup -c -p -v -t 1 -i media_small.dat -o output.dat.ddp
+#./dedup -c -p -v -t 1 -i media_medium.dat -o output.dat.ddp
 #./dedup -c -p -v -t 1 -i media_large.dat -o output.dat.ddp
