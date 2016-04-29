@@ -3,5 +3,5 @@
 #./fluidanimate 1 1 in_15K.fluid out.fluid
 #./fluidanimate 1 1 in_35K.fluid out.fluid
 #./fluidanimate 1 1 in_100K.fluid out.fluid
-./fluidanimate 1 1 in_300K.fluid out.fluid
-#./fluidanimate 1 1 in_500K.fluid out.fluid
+#./fluidanimate 1 1 in_300K.fluid out.fluid
+./fluidanimate 1 1 in_500K.fluid out.fluid
