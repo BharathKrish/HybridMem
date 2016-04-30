@@ -118,6 +118,7 @@ unsigned long totalcma_pages __read_mostly;
 
 int percpu_pagelist_fraction;
 gfp_t gfp_allowed_mask __read_mostly = GFP_BOOT_MASK;
+unsigned long alloc_page_count,alloc_slowpath_count;
 
 /*
  * A cached value of the page's pageblock's migratetype, used when the page is
@@ -3182,6 +3183,21 @@ nopage:
 got_pg:
 	return page;
 }
+//PRAM_PROJ
+void print_alloc_count(void){
+ printk("Total_alloc:%lu  Alloc_slowpath:%lu\n",alloc_page_count,alloc_slowpath_count);
+ alloc_page_count=0;
+ alloc_slowpath_count=0;
+}
+EXPORT_SYMBOL(print_alloc_count);
+
+void inc_page_alloc(void){
+ alloc_page_count++;
+}
+void inc_page_slowpath(void){
+ alloc_slowpath_count++;
+}
+//PRAM_PROJ
 
 /*
  * This is the 'heart' of the zoned buddy allocator.
@@ -3200,6 +3216,7 @@ __alloc_pages_nodemask(gfp_t gfp_mask, unsigned int order,
 		.nodemask = nodemask,
 		.migratetype = gfpflags_to_migratetype(gfp_mask),
 	};
+        
 
 	gfp_mask &= gfp_allowed_mask;
 
@@ -3251,8 +3268,9 @@ retry_cpuset:
 		ac.spread_dirty_pages = false;
 
 		page = __alloc_pages_slowpath(alloc_mask, order, &ac);
+                inc_page_slowpath();
 	}
-
+        inc_page_alloc();
 	if (kmemcheck_enabled && page)
 		kmemcheck_pagealloc_alloc(page, order, gfp_mask);
 

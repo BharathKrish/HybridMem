@@ -2201,14 +2201,13 @@ static inline void init_tlb_ubc(void)
 }
 #endif /* CONFIG_ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH */
 
-void wakeup_migrate(void)
+unsigned int wakeup_migrate(void)
 {
  int nid=DRAM_NODE;
  int i=0,ret;
  unsigned long length_inactive;
- struct zonelist* z_list= NODE_DATA(nid)->node_zonelists;
  struct zone* zone;
- enum lru_list lru=LRU_INACTIVE_ANON;
+ enum lru_list lru=LRU_INACTIVE_FILE;
  struct page *page,*page2;
  LIST_HEAD(migrate_list); 
  INIT_LIST_HEAD(&migrate_list);
@@ -2223,7 +2222,7 @@ void wakeup_migrate(void)
  //printk("Prashanth: Migrating anon pages\n");
  //struct zoneref* z_ref=first_zones_zonelist(z_list,ZONE_NORMAL,NULL,&zone);
  //printk("Prashanth:Number of zones in this node is %d\n",zone->zone_pgdat->nr_zones);
- length_inactive=zone_page_state(zone,NR_INACTIVE_ANON);
+ length_inactive=zone_page_state(zone,NR_INACTIVE_FILE);
  printk("Prashanth: Length of inactive list is %lu\n",length_inactive);
  list_for_each_entry_safe_reverse(page2,page,inactive_head,lru) {
       if (i < length_inactive/2){
@@ -2236,7 +2235,7 @@ void wakeup_migrate(void)
          break;
  }
  if (length_inactive <=1)
-   return;
+   return 0;
  //printk("Prashanth:Number of items is %d\n",i);
         
  switch (lru) {
@@ -2251,6 +2250,7 @@ void wakeup_migrate(void)
   default:
      break;
    }
+ return (length_inactive/2 - ret);
 }
 EXPORT_SYMBOL(wakeup_migrate);
  

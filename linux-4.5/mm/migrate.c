@@ -1179,7 +1179,7 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
 		}
 	}
 	nr_failed += retry;
-        printk("Prashanth:migrate returned %d\n",rc);
+        //printk("Prashanth:migrate returned %d\n",rc);
 	rc = nr_failed;
 out:
 	if (nr_succeeded)

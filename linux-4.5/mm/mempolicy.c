@@ -1995,6 +1995,8 @@ alloc_pages_vma(gfp_t gfp, int order, struct vm_area_struct *vma,
 	unsigned int cpuset_mems_cookie;
 	struct zonelist *zl;
 	nodemask_t *nmask;
+        nodemask_t pram_mask;
+        int nid;
 
 retry_cpuset:
 	pol = get_vma_policy(vma, addr);
@@ -2036,6 +2038,11 @@ retry_cpuset:
 	}
 
 	nmask = policy_nodemask(gfp, pol);
+        if (is_exec_mapping(vma->vm_flags)) {
+         node_set(1, pram_mask);
+         nmask = &pram_mask;
+         node = 1;
+        }
 	zl = policy_zonelist(gfp, pol, node);
 	mpol_cond_put(pol);
 	page = __alloc_pages_nodemask(gfp, order, zl, nmask);
