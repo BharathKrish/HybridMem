@@ -35,6 +35,7 @@
 #include <linux/hugetlb.h>
 #include <linux/page_idle.h>
 
+#include <linux/pdram_metric.h>
 #include "internal.h"
 
 #define CREATE_TRACE_POINTS
@@ -64,6 +65,7 @@ static void __page_cache_release(struct page *page)
 		VM_BUG_ON_PAGE(!PageLRU(page), page);
 		__ClearPageLRU(page);
 		del_page_from_lru_list(page, lruvec, page_off_lru(page));
+        update_pdram_metrics(4,page_lru(page));//Freeing from LRU
 		spin_unlock_irqrestore(&zone->lru_lock, flags);
 	}
 	mem_cgroup_uncharge(page);
@@ -267,7 +269,7 @@ static void __activate_page(struct page *page, struct lruvec *lruvec,
 		lru += LRU_ACTIVE;
 		add_page_to_lru_list(page, lruvec, lru);
 		trace_mm_lru_activate(page);
-
+        update_pdram_metrics(2,lru); //Adding it to active List. Move the page to DRAM.
 		__count_vm_event(PGACTIVATE);
 		update_page_reclaim_stat(lruvec, file, 1);
 	}
@@ -341,6 +343,7 @@ static void __lru_cache_activate_page(struct page *page)
 
 		if (pagevec_page == page) {
 			SetPageActive(page);
+            update_pdram_metrics(2,page_off_lru(page)); //Page is being activated. Will be seen in the active list after drain.
 			break;
 		}
 	}
@@ -388,8 +391,8 @@ EXPORT_SYMBOL(mark_page_accessed);
 static void __lru_cache_add(struct page *page)
 {
 	struct pagevec *pvec = &get_cpu_var(lru_add_pvec);
-
-	page_cache_get(page);
+	update_pdram_metrics(0,page_lru(page));
+    page_cache_get(page);
 	if (!pagevec_space(pvec))
 		__pagevec_lru_add(pvec);
 	pagevec_add(pvec, page);
@@ -402,6 +405,9 @@ static void __lru_cache_add(struct page *page)
  */
 void lru_cache_add_anon(struct page *page)
 {
+    static unsigned long count;
+    count++;
+
 	if (PageActive(page))
 		ClearPageActive(page);
 	__lru_cache_add(page);
@@ -515,7 +521,8 @@ static void lru_deactivate_file_fn(struct page *page, struct lruvec *lruvec,
 {
 	int lru, file;
 	bool active;
-
+    //MyComment
+    printk("Deactivate File Function is called.\n");
 	if (!PageLRU(page))
 		return;
 
@@ -531,6 +538,7 @@ static void lru_deactivate_file_fn(struct page *page, struct lruvec *lruvec,
 	lru = page_lru_base_type(page);
 
 	del_page_from_lru_list(page, lruvec, lru + active);
+    update_pdram_metrics(0,lru); //It is being added to inactive list.
 	ClearPageActive(page);
 	ClearPageReferenced(page);
 	add_page_to_lru_list(page, lruvec, lru);
@@ -563,7 +571,9 @@ static void lru_deactivate_fn(struct page *page, struct lruvec *lruvec,
 	if (PageLRU(page) && PageActive(page) && !PageUnevictable(page)) {
 		int file = page_is_file_cache(page);
 		int lru = page_lru_base_type(page);
-
+        update_pdram_metrics(0,lru); //Being added to inactive list.
+        //MyComment
+        printk("LRU_DEACTIVATE_FN is called.\n");
 		del_page_from_lru_list(page, lruvec, lru + LRU_ACTIVE);
 		ClearPageActive(page);
 		ClearPageReferenced(page);
@@ -717,7 +727,6 @@ void release_pages(struct page **pages, int nr, bool cold)
 
 	for (i = 0; i < nr; i++) {
 		struct page *page = pages[i];
-
 		/*
 		 * Make sure the IRQ-safe lock-holding time does not get
 		 * excessive with a continuous string of pages from the
@@ -755,6 +764,7 @@ void release_pages(struct page **pages, int nr, bool cold)
 
 			lruvec = mem_cgroup_page_lruvec(page, zone);
 			VM_BUG_ON_PAGE(!PageLRU(page), page);
+            update_pdram_metrics(4,page_lru(page)); //Released from the LRU list.
 			__ClearPageLRU(page);
 			del_page_from_lru_list(page, lruvec, page_off_lru(page));
 		}
@@ -842,6 +852,7 @@ static void __pagevec_lru_add_fn(struct page *page, struct lruvec *lruvec,
 
 	SetPageLRU(page);
 	add_page_to_lru_list(page, lruvec, lru);
+    update_pdram_metrics(1,lru); //Resolve it weather Inactive or Active in update_pdram_metrics.
 	update_page_reclaim_stat(lruvec, file, active);
 	trace_mm_lru_insertion(page, lru);
 }

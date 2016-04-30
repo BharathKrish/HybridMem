@@ -28,8 +28,13 @@ enum migrate_reason {
 
 #ifdef CONFIG_MIGRATION
 enum inactive_type;
+<<<<<<< HEAD
 extern void print_alloc_count(void);
 extern unsigned int wakeup_migrate(void);
+=======
+extern void wakeup_migrate(void);
+extern void scan_lists(void);
+>>>>>>> f996d26f9979942c67b9b339d2f4dd262f68d4dc
 extern int migrate_to_pram(struct list_head* l, enum inactive_type type);
 extern void putback_movable_pages(struct list_head *l);
 extern int migrate_page(struct address_space *,

@@ -53,11 +53,11 @@
 
 #include <linux/swapops.h>
 #include <linux/balloon_compaction.h>
-
+#include <linux/pdram_metric.h>
 #include <linux/pram.h>
 #include <linux/migrate.h>
 #include "internal.h"
-
+#include <linux/page_idle.h>
 #define CREATE_TRACE_POINTS
 #include <trace/events/vmscan.h>
 
@@ -1211,6 +1211,7 @@ free_it:
 		 * Is there need to periodically free_page_list? It would
 		 * appear not as the counts should be low
 		 */
+        update_pdram_metrics(4,page_off_lru(page));
 		list_add(&page->lru, &free_pages);
 		continue;
 
@@ -1457,6 +1458,7 @@ int isolate_lru_page(struct page *page)
 			int lru = page_lru(page);
 			get_page(page);
 			ClearPageLRU(page);
+            update_pdram_metrics(4,lru); //Out of LRU list. Is isolated. But still in the same RAM.
 			del_page_from_lru_list(page, lruvec, lru);
 			ret = 0;
 		}
@@ -1530,7 +1532,7 @@ putback_inactive_pages(struct lruvec *lruvec, struct list_head *page_list)
 		SetPageLRU(page);
 		lru = page_lru(page);
 		add_page_to_lru_list(page, lruvec, lru);
-
+        update_pdram_metrics(0,lru); //Being added to the inactive list.
 		if (is_active_lru(lru)) {
 			int file = is_file_lru(lru);
 			int numpages = hpage_nr_pages(page);
@@ -1540,7 +1542,7 @@ putback_inactive_pages(struct lruvec *lruvec, struct list_head *page_list)
 			__ClearPageLRU(page);
 			__ClearPageActive(page);
 			del_page_from_lru_list(page, lruvec, lru);
-
+            update_pdram_metrics(4,lru);
 			if (unlikely(PageCompound(page))) {
 				spin_unlock_irq(&zone->lru_lock);
 				mem_cgroup_uncharge(page);
@@ -1750,17 +1752,16 @@ static void move_active_pages_to_lru(struct lruvec *lruvec,
 
 		VM_BUG_ON_PAGE(PageLRU(page), page);
 		SetPageLRU(page);
-
 		nr_pages = hpage_nr_pages(page);
 		mem_cgroup_update_lru_size(lruvec, lru, nr_pages);
 		list_move(&page->lru, &lruvec->lists[lru]);
 		pgmoved += nr_pages;
-
+        update_pdram_metrics(0,lru); //Being moved to the inactive list.
 		if (put_page_testzero(page)) {
 			__ClearPageLRU(page);
 			__ClearPageActive(page);
 			del_page_from_lru_list(page, lruvec, lru);
-
+            update_pdram_metrics(4,lru);
 			if (unlikely(PageCompound(page))) {
 				spin_unlock_irq(&zone->lru_lock);
 				mem_cgroup_uncharge(page);
@@ -1846,12 +1847,14 @@ static void shrink_active_list(unsigned long nr_to_scan,
 			 */
 			if ((vm_flags & VM_EXEC) && page_is_file_cache(page)) {
 				list_add(&page->lru, &l_active);
+                update_pdram_metrics(2,lru);
 				continue;
 			}
 		}
 
 		ClearPageActive(page);	/* we are de-activating */
 		list_add(&page->lru, &l_inactive);
+        update_pdram_metrics(0,lru);
 	}
 
 	/*
@@ -1870,7 +1873,6 @@ static void shrink_active_list(unsigned long nr_to_scan,
 	move_active_pages_to_lru(lruvec, &l_inactive, &l_hold, lru - LRU_ACTIVE);
 	__mod_zone_page_state(zone, NR_ISOLATED_ANON + file, -nr_taken);
 	spin_unlock_irq(&zone->lru_lock);
-
 	mem_cgroup_uncharge_list(&l_hold);
 	free_hot_cold_page_list(&l_hold, true);
 }
@@ -2254,7 +2256,67 @@ unsigned int wakeup_migrate(void)
 }
 EXPORT_SYMBOL(wakeup_migrate);
  
- 
+void scan_lists(void)
+{
+ int nid=DRAM_NODE;
+ struct zonelist* z_list= NODE_DATA(nid)->node_zonelists;
+ struct zone* zone;
+ enum lru_list lru=LRU_INACTIVE_FILE;
+ struct page *page,*page2;
+ LIST_HEAD(migrate_list); 
+ INIT_LIST_HEAD(&migrate_list);
+ int j;
+ zone = &NODE_DATA(nid)->node_zones[0];
+ for (j=0; j < NODE_DATA(nid)->nr_zones; j++){
+  if(populated_zone(&NODE_DATA(nid)->node_zones[j])){
+    zone = &NODE_DATA(nid)->node_zones[j];
+  }
+ }
+ int lru_list;
+ for(lru_list=LRU_INACTIVE_ANON; lru_list <= LRU_UNEVICTABLE; lru_list++){
+    struct list_head* inactive_head=&zone->lruvec.lists[lru_list];
+    unsigned long Dirty_Referenced=0, Dirty_UnReferenced=0, Clean_Referenced=0, Clean_UnReferenced=0;
+    unsigned int i= 0;
+    local_irq_disable();
+    list_for_each_entry_safe_reverse(page2,page,inactive_head,lru) {
+         i++;
+            if(!page_is_idle(page2) && PageDirty(page2)) {
+                Dirty_Referenced++;
+                //ClearPageReferenced(page2);
+                set_page_idle(page2);
+            }
+            else if( page_is_idle(page2) && PageDirty(page2)) {
+                Dirty_UnReferenced++;
+                //SetPageReferenced(page2);
+                //set_page_idle(page2);
+            }
+            else if( !page_is_idle(page2) && !PageDirty(page2)) {
+                Clean_Referenced++; 
+                //ClearPageReferenced(page2);
+                set_page_idle(page2);
+            }
+            else if(page_is_idle(page2) && !PageDirty(page2)){
+                Clean_UnReferenced++;
+                //SetPageReferenced(page2);
+                //set_page_idle(page2);
+            }
+    }
+    switch(lru_list){
+        case 0: printk("-------------LRU_INACTIVE_ANON-------------\n");break;
+        case 1: printk("-------------LRU_ACTIVE_ANON---------------\n");break;
+        case 2: printk("-------------LRU_INACTIVE_FILE-------------\n");break;
+        case 3: printk("-------------LRU_ACTIVE_FILE---------------\n");break;
+        case 4: printk("-------------LRU_UNEVICTABLE---------------\n");break;
+    }
+    printk(" Total number of pages : %d\n",i);
+    printk(" Percentage of Unreferenced Clean pages : %ld\n", Clean_UnReferenced);
+    printk(" Percentage of Referenced Clean pages : %ld\n", Clean_Referenced);
+    printk(" Percentage of Unreferenced Dirty pages : %ld\n", Dirty_UnReferenced);
+    printk(" Percentage of Referenced Dirty pages : %ld\n", Dirty_Referenced);
+ }
+ local_irq_enable();       
+}
+EXPORT_SYMBOL(scan_lists);
 /*
  * This is a basic per-zone page freer.  Used by both kswapd and direct reclaim.
  */
@@ -3958,6 +4020,7 @@ void check_move_unevictable_pages(struct page **pages, int nr_pages)
 			ClearPageUnevictable(page);
 			del_page_from_lru_list(page, lruvec, LRU_UNEVICTABLE);
 			add_page_to_lru_list(page, lruvec, lru);
+            update_pdram_metrics(1,lru);//Being added to lru list. Could be active or inactive list.
 			pgrescued++;
 		}
 	}

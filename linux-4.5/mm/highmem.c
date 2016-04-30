@@ -170,7 +170,7 @@ static void flush_all_zero_pkmaps(void)
 	int need_flush = 0;
 
 	flush_cache_kmaps();
-
+    printk("Executing flush_all_zero_pkmaps\n");
 	for (i = 0; i < LAST_PKMAP; i++) {
 		struct page *page;
 

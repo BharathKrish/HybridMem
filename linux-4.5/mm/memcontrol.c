@@ -67,7 +67,7 @@
 #include <net/sock.h>
 #include <net/ip.h>
 #include "slab.h"
-
+#include <linux/pdram_metric.h>
 #include <asm/uaccess.h>
 
 #include <trace/events/vmscan.h>
@@ -2131,6 +2131,7 @@ static void lock_page_lru(struct page *page, int *isolated)
 
 		lruvec = mem_cgroup_page_lruvec(page, zone);
 		ClearPageLRU(page);
+        update_pdram_metrics(4,page_lru(page)); //Not sure of the logic. I think it is being released from the LRU list.
 		del_page_from_lru_list(page, lruvec, page_lru(page));
 		*isolated = 1;
 	} else
@@ -2148,6 +2149,7 @@ static void unlock_page_lru(struct page *page, int isolated)
 		VM_BUG_ON_PAGE(PageLRU(page), page);
 		SetPageLRU(page);
 		add_page_to_lru_list(page, lruvec, page_lru(page));
+        update_pdram_metrics(1,lru); //Resolve it using lru.
 	}
 	spin_unlock_irq(&zone->lru_lock);
 }

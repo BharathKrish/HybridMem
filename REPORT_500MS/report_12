@@ -1,0 +1,152 @@
+[ 1288.028700] my_work.x 1
+[ 1288.028707] my_work.x 2
+[ 1289.030049] -------------LRU_INACTIVE_ANON-------------
+[ 1289.030052]  Total number of pages : 51
+[ 1289.030053]  Percentage of Unreferenced Clean pages : 0
+[ 1289.030054]  Percentage of Referenced Clean pages : 0
+[ 1289.030055]  Percentage of Unreferenced Dirty pages : 50
+[ 1289.030056]  Percentage of Referenced Dirty pages : 1
+[ 1289.030153] -------------LRU_ACTIVE_ANON---------------
+[ 1289.030154]  Total number of pages : 2239
+[ 1289.030155]  Percentage of Unreferenced Clean pages : 2176
+[ 1289.030155]  Percentage of Referenced Clean pages : 44
+[ 1289.030156]  Percentage of Unreferenced Dirty pages : 19
+[ 1289.030157]  Percentage of Referenced Dirty pages : 0
+[ 1289.030953] -------------LRU_INACTIVE_FILE-------------
+[ 1289.030954]  Total number of pages : 43355
+[ 1289.030955]  Percentage of Unreferenced Clean pages : 43264
+[ 1289.030955]  Percentage of Referenced Clean pages : 6
+[ 1289.030956]  Percentage of Unreferenced Dirty pages : 79
+[ 1289.030957]  Percentage of Referenced Dirty pages : 6
+[ 1289.031028] -------------LRU_ACTIVE_FILE---------------
+[ 1289.031028]  Total number of pages : 26695
+[ 1289.031028]  Percentage of Unreferenced Clean pages : 25923
+[ 1289.031028]  Percentage of Referenced Clean pages : 755
+[ 1289.031028]  Percentage of Unreferenced Dirty pages : 10
+[ 1289.031028]  Percentage of Referenced Dirty pages : 7
+[ 1289.031028] -------------LRU_UNEVICTABLE---------------
+[ 1289.031028]  Total number of pages : 0
+[ 1289.031028]  Percentage of Unreferenced Clean pages : 0
+[ 1289.031028]  Percentage of Referenced Clean pages : 0
+[ 1289.031028]  Percentage of Unreferenced Dirty pages : 0
+[ 1289.031028]  Percentage of Referenced Dirty pages : 0
+[ 1289.531231] -------------LRU_INACTIVE_ANON-------------
+[ 1289.531261]  Total number of pages : 51
+[ 1289.531264]  Percentage of Unreferenced Clean pages : 0
+[ 1289.531267]  Percentage of Referenced Clean pages : 0
+[ 1289.531269]  Percentage of Unreferenced Dirty pages : 51
+[ 1289.531271]  Percentage of Referenced Dirty pages : 0
+[ 1289.531513] -------------LRU_ACTIVE_ANON---------------
+[ 1289.531516]  Total number of pages : 2255
+[ 1289.531518]  Percentage of Unreferenced Clean pages : 2203
+[ 1289.531520]  Percentage of Referenced Clean pages : 33
+[ 1289.531522]  Percentage of Unreferenced Dirty pages : 19
+[ 1289.531525]  Percentage of Referenced Dirty pages : 0
+[ 1289.532185] -------------LRU_INACTIVE_FILE-------------
+[ 1289.532185]  Total number of pages : 43355
+[ 1289.532185]  Percentage of Unreferenced Clean pages : 43270
+[ 1289.532185]  Percentage of Referenced Clean pages : 0
+[ 1289.532185]  Percentage of Unreferenced Dirty pages : 84
+[ 1289.532185]  Percentage of Referenced Dirty pages : 1
+[ 1289.532185] -------------LRU_ACTIVE_FILE---------------
+[ 1289.532185]  Total number of pages : 26696
+[ 1289.532185]  Percentage of Unreferenced Clean pages : 26138
+[ 1289.532185]  Percentage of Referenced Clean pages : 540
+[ 1289.532185]  Percentage of Unreferenced Dirty pages : 13
+[ 1289.532185]  Percentage of Referenced Dirty pages : 5
+[ 1289.532185] -------------LRU_UNEVICTABLE---------------
+[ 1289.532185]  Total number of pages : 0
+[ 1289.532185]  Percentage of Unreferenced Clean pages : 0
+[ 1289.532185]  Percentage of Referenced Clean pages : 0
+[ 1289.532185]  Percentage of Unreferenced Dirty pages : 0
+[ 1289.532185]  Percentage of Referenced Dirty pages : 0
+[ 1290.032136] -------------LRU_INACTIVE_ANON-------------
+[ 1290.032158]  Total number of pages : 51
+[ 1290.032161]  Percentage of Unreferenced Clean pages : 0
+[ 1290.032163]  Percentage of Referenced Clean pages : 0
+[ 1290.032165]  Percentage of Unreferenced Dirty pages : 51
+[ 1290.032166]  Percentage of Referenced Dirty pages : 0
+[ 1290.032412] -------------LRU_ACTIVE_ANON---------------
+[ 1290.032413]  Total number of pages : 2255
+[ 1290.032415]  Percentage of Unreferenced Clean pages : 2236
+[ 1290.032417]  Percentage of Referenced Clean pages : 0
+[ 1290.032419]  Percentage of Unreferenced Dirty pages : 19
+[ 1290.032421]  Percentage of Referenced Dirty pages : 0
+[ 1290.033097] -------------LRU_INACTIVE_FILE-------------
+[ 1290.033097]  Total number of pages : 43355
+[ 1290.033097]  Percentage of Unreferenced Clean pages : 43270
+[ 1290.033097]  Percentage of Referenced Clean pages : 0
+[ 1290.033097]  Percentage of Unreferenced Dirty pages : 84
+[ 1290.033097]  Percentage of Referenced Dirty pages : 1
+[ 1290.033097] -------------LRU_ACTIVE_FILE---------------
+[ 1290.033097]  Total number of pages : 26696
+[ 1290.033097]  Percentage of Unreferenced Clean pages : 26678
+[ 1290.033097]  Percentage of Referenced Clean pages : 0
+[ 1290.033097]  Percentage of Unreferenced Dirty pages : 15
+[ 1290.033097]  Percentage of Referenced Dirty pages : 3
+[ 1290.033097] -------------LRU_UNEVICTABLE---------------
+[ 1290.033097]  Total number of pages : 0
+[ 1290.033097]  Percentage of Unreferenced Clean pages : 0
+[ 1290.033097]  Percentage of Referenced Clean pages : 0
+[ 1290.033097]  Percentage of Unreferenced Dirty pages : 0
+[ 1290.033097]  Percentage of Referenced Dirty pages : 0
+[ 1290.533123] -------------LRU_INACTIVE_ANON-------------
+[ 1290.533140]  Total number of pages : 51
+[ 1290.533142]  Percentage of Unreferenced Clean pages : 0
+[ 1290.533143]  Percentage of Referenced Clean pages : 0
+[ 1290.533145]  Percentage of Unreferenced Dirty pages : 51
+[ 1290.533146]  Percentage of Referenced Dirty pages : 0
+[ 1290.533300] -------------LRU_ACTIVE_ANON---------------
+[ 1290.533301]  Total number of pages : 2255
+[ 1290.533302]  Percentage of Unreferenced Clean pages : 2236
+[ 1290.533303]  Percentage of Referenced Clean pages : 0
+[ 1290.533305]  Percentage of Unreferenced Dirty pages : 19
+[ 1290.533306]  Percentage of Referenced Dirty pages : 0
+[ 1290.534093] -------------LRU_INACTIVE_FILE-------------
+[ 1290.534093]  Total number of pages : 43355
+[ 1290.534093]  Percentage of Unreferenced Clean pages : 43270
+[ 1290.534093]  Percentage of Referenced Clean pages : 0
+[ 1290.534093]  Percentage of Unreferenced Dirty pages : 85
+[ 1290.534093]  Percentage of Referenced Dirty pages : 0
+[ 1290.534093] -------------LRU_ACTIVE_FILE---------------
+[ 1290.534093]  Total number of pages : 26696
+[ 1290.534093]  Percentage of Unreferenced Clean pages : 26678
+[ 1290.534093]  Percentage of Referenced Clean pages : 0
+[ 1290.534093]  Percentage of Unreferenced Dirty pages : 16
+[ 1290.534093]  Percentage of Referenced Dirty pages : 2
+[ 1290.534093] -------------LRU_UNEVICTABLE---------------
+[ 1290.534093]  Total number of pages : 0
+[ 1290.534093]  Percentage of Unreferenced Clean pages : 0
+[ 1290.534093]  Percentage of Referenced Clean pages : 0
+[ 1290.534093]  Percentage of Unreferenced Dirty pages : 0
+[ 1290.534093]  Percentage of Referenced Dirty pages : 0
+[ 1291.034224] -------------LRU_INACTIVE_ANON-------------
+[ 1291.034230]  Total number of pages : 51
+[ 1291.034232]  Percentage of Unreferenced Clean pages : 0
+[ 1291.034233]  Percentage of Referenced Clean pages : 0
+[ 1291.034235]  Percentage of Unreferenced Dirty pages : 51
+[ 1291.034236]  Percentage of Referenced Dirty pages : 0
+[ 1291.034408] -------------LRU_ACTIVE_ANON---------------
+[ 1291.034409]  Total number of pages : 2232
+[ 1291.034411]  Percentage of Unreferenced Clean pages : 2211
+[ 1291.034412]  Percentage of Referenced Clean pages : 2
+[ 1291.034414]  Percentage of Unreferenced Dirty pages : 19
+[ 1291.034415]  Percentage of Referenced Dirty pages : 0
+[ 1291.035192] -------------LRU_INACTIVE_FILE-------------
+[ 1291.035192]  Total number of pages : 43358
+[ 1291.035192]  Percentage of Unreferenced Clean pages : 43270
+[ 1291.035192]  Percentage of Referenced Clean pages : 0
+[ 1291.035192]  Percentage of Unreferenced Dirty pages : 84
+[ 1291.035192]  Percentage of Referenced Dirty pages : 4
+[ 1291.035192] -------------LRU_ACTIVE_FILE---------------
+[ 1291.035192]  Total number of pages : 26697
+[ 1291.035192]  Percentage of Unreferenced Clean pages : 26041
+[ 1291.035192]  Percentage of Referenced Clean pages : 637
+[ 1291.035192]  Percentage of Unreferenced Dirty pages : 17
+[ 1291.035192]  Percentage of Referenced Dirty pages : 2
+[ 1291.035192] -------------LRU_UNEVICTABLE---------------
+[ 1291.035192]  Total number of pages : 0
+[ 1291.035192]  Percentage of Unreferenced Clean pages : 0
+[ 1291.035192]  Percentage of Referenced Clean pages : 0
+[ 1291.035192]  Percentage of Unreferenced Dirty pages : 0
+[ 1291.035192]  Percentage of Referenced Dirty pages : 0
