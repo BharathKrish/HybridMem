@@ -1,4 +1,4 @@
-#obj-m += wq_test.o
+obj-m += wq_test.o
 obj-m += prashanth_migrate.o
 
 all:
