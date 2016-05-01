@@ -2038,11 +2038,11 @@ retry_cpuset:
 	}
 
 	nmask = policy_nodemask(gfp, pol);
-        if (is_exec_mapping(vma->vm_flags)) {
-         node_set(1, pram_mask);
-         nmask = &pram_mask;
-         node = 1;
-        }
+        //if (is_exec_mapping(vma->vm_flags)) {
+         //node_set(1, pram_mask);
+        // nmask = &pram_mask;
+        // node = 1;
+       // }
 	zl = policy_zonelist(gfp, pol, node);
 	mpol_cond_put(pol);
 	page = __alloc_pages_nodemask(gfp, order, zl, nmask);

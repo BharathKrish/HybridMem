@@ -2209,50 +2209,60 @@ unsigned int wakeup_migrate(void)
  int i=0,ret;
  unsigned long length_inactive;
  struct zone* zone;
- enum lru_list lru=LRU_INACTIVE_FILE;
+ enum lru_list lru=LRU_INACTIVE_ANON;
  struct page *page,*page2;
  LIST_HEAD(migrate_list); 
  INIT_LIST_HEAD(&migrate_list);
- int j;
+ int j=0;
  zone = &NODE_DATA(nid)->node_zones[0];
  for (j=0; j < NODE_DATA(nid)->nr_zones; j++){
   if(populated_zone(&NODE_DATA(nid)->node_zones[j])){
     zone = &NODE_DATA(nid)->node_zones[j];
   }
  }
- struct list_head* inactive_head=&zone->lruvec.lists[lru];
- //printk("Prashanth: Migrating anon pages\n");
- //struct zoneref* z_ref=first_zones_zonelist(z_list,ZONE_NORMAL,NULL,&zone);
- //printk("Prashanth:Number of zones in this node is %d\n",zone->zone_pgdat->nr_zones);
- length_inactive=zone_page_state(zone,NR_INACTIVE_FILE);
- printk("Prashanth: Length of inactive list is %lu\n",length_inactive);
- list_for_each_entry_safe_reverse(page2,page,inactive_head,lru) {
-      if (i < length_inactive/2){
-        i++;
-        //printk("Prashanth:is page mapped %d\n",page_mapped(page2));
-        isolate_lru_page(page2);
-        list_add(&page2->lru,&migrate_list);
-      }
-      else
-         break;
- }
- if (length_inactive <=1)
-   return 0;
- //printk("Prashanth:Number of items is %d\n",i);
+    struct list_head* inactive_head=&zone->lruvec.lists[lru];
+    //printk("Prashanth: Migrating anon pages\n");
+    //struct zoneref* z_ref=first_zones_zonelist(z_list,ZONE_NORMAL,NULL,&zone);
+    //printk("Prashanth:Number of zones in this node is %d\n",zone->zone_pgdat->nr_zones);
+    length_inactive=zone_page_state(zone,NR_INACTIVE_ANON);
+    if(length_inactive < 15000) return 0;
+    local_irq_disable();
+    printk("Prashanth: Length of inactive list is %lu\n",length_inactive);
+    list_for_each_entry_safe_reverse(page2,page,inactive_head,lru) {
+        if (i <= 10000){
+            i++;
+            //printk("Prashanth:is page mapped %d\n",page_mapped(page2));
+            isolate_lru_page(page2);
+            list_add(&page2->lru,&migrate_list);
+		    inc_zone_page_state(page2, NR_ISOLATED_ANON +
+					    page_is_file_cache(page2));
+        }
+        else
+            break;
+    }
+    if ( i == 0){
+        local_irq_enable();
+        return 0;
+    }    
+        //printk("Prashanth:Number of items is %d\n",i);
         
- switch (lru) {
-  case LRU_INACTIVE_ANON:
-      ret=migrate_to_pram(&migrate_list,PRAM_ANON);
-      printk("Prashanth: Could not Migrate %d anon pages\n",ret);
-     break;
-  case LRU_INACTIVE_FILE:
-       ret=migrate_to_pram(&migrate_list,PRAM_FILE);
-       printk("Prashanth: Could not migrate %d file pages\n",ret);
-     break;
-  default:
-     break;
-   }
- return (length_inactive/2 - ret);
+    switch (lru) {
+        case LRU_INACTIVE_ANON:
+                ret=migrate_to_pram(&migrate_list,PRAM_ANON);
+                if(ret)
+			         putback_movable_pages(&migrate_list);
+
+                    //printk("Prashanth: Could not Migrate %d anon pages\n",ret);
+                break;
+        case LRU_INACTIVE_FILE:
+                ret=migrate_to_pram(&migrate_list,PRAM_FILE);
+                //printk("Prashanth: Could not migrate %d file pages\n",ret);
+            break;
+        default:
+                break;
+    }
+ return (i -ret);
+ local_irq_enable();
 }
 EXPORT_SYMBOL(wakeup_migrate);
  
@@ -3670,7 +3680,7 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type classzone_idx)
 		return;
 	if (zone_balanced(zone, order, 0, 0))
 		return;
-
+    //printk("Calling kswapd for node_id %d\n",pgdat->node_id);
 	trace_mm_vmscan_wakeup_kswapd(pgdat->node_id, zone_idx(zone), order);
 	wake_up_interruptible(&pgdat->kswapd_wait);
 }
