@@ -33,15 +33,15 @@ void my_timer_callback(){
     int ret;
     unsigned int nr_pages;
     struct timespec64 time_diff;
-     setup_timer(&my_timer, my_timer_callback, 0);
-     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(5000));
-     if(ret) printk("Error in calling the mod_timer again\n");
      getnstimeofday(&start_time);
      nr_pages = wakeup_migrate();
      //print_alloc_count();
      getnstimeofday(&end_time);
      time_diff=timespec64_sub(end_time,start_time);
      printk("Migrate : nr_pages: %u time_taken: %ld\n",nr_pages,timespec64_to_ns(&time_diff));
+     setup_timer(&my_timer, my_timer_callback, 0);
+     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(300));
+     if(ret) printk("Error in calling the mod_timer again\n");
 }
 
 int init_module( void )
@@ -73,7 +73,7 @@ int init_module( void )
      //Setting up the timer.
 
      setup_timer(&my_timer, my_timer_callback, 0);
-     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(1000));
+     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(10));
      wakeup_migrate();
      return 0;
 }

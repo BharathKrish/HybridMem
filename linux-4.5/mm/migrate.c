@@ -1144,9 +1144,6 @@ int migrate_pages(struct list_head *from, new_page_t get_new_page,
 
 		list_for_each_entry_safe(page, page2, from, lru) {
 			cond_resched();
-                        if (!page_mapped(page)){
-                          printk("Prashanth: Given page is not mapped\n");
-                        }
 
 			if (PageHuge(page))
 				rc = unmap_and_move_huge_page(get_new_page,
@@ -1208,7 +1205,7 @@ struct page_to_node {
 static struct page* alloc_page_pram(struct page* p, unsigned long private, int **result) 
 {
   struct pram_migrate *pm=(struct pram_migrate*)private;
-  return __alloc_pages_node(pm->node,GFP_ATOMIC|__GFP_THISNODE,0);
+  return __alloc_pages_node(pm->node,GFP_HIGHUSER_MOVABLE|__GFP_THISNODE,0);
   
 }
 
