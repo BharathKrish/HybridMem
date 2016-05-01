@@ -30,7 +30,7 @@ static void my_wq_function( struct work_struct *work)
 void my_timer_callback(){
     int ret;
      setup_timer(&my_timer, my_timer_callback, 0);
-     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(100));
+     ret = mod_timer(&my_timer, jiffies+msecs_to_jiffies(500));
      if(ret) printk("Error in calling the mod_timer again\n");
      scan_lists();
 }
