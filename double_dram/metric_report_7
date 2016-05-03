@@ -1,0 +1,25 @@
+    nr_free_pages 3359
+    nr_free_pages 105167
+    nr_free_pages 126997
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089937
+    nr_free_pages 470
+    nr_free_pages 573
+    nr_free_pages 98686
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089946
+    nr_free_pages 470
+    nr_free_pages 577
+    nr_free_pages 97163
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089946
+    nr_free_pages 3345
+    nr_free_pages 104830
+    nr_free_pages 117879
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089946
+    nr_free_pages 3342
+    nr_free_pages 104826
+    nr_free_pages 117883
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089946

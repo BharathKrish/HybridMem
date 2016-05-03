@@ -1,0 +1,6 @@
+numactl: execution of `./run.scr': No such file or directory
+
+
+real	0m0.023s
+user	0m0.000s
+sys	0m0.001s

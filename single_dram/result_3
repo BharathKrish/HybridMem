@@ -1,0 +1,14 @@
+PARSEC Benchmark Suite Version 3.0-beta-20150206
+Total input size:                       10.10 MB
+Total output size:                       9.28 MB
+Effective compression factor:            1.09x
+
+Mean data chunk size:                    3.64 KB (stddev: 202.63 KB)
+Amount of duplicate chunks:              4.33%
+Data size after deduplication:          10.09 MB (compression factor: 1.00x)
+Data size after compression:             9.25 MB (compression factor: 1.09x)
+Output overhead:                         0.29%
+
+real	0m0.759s
+user	0m0.424s
+sys	0m0.105s

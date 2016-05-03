@@ -1,0 +1,10 @@
+    nr_free_pages 3343
+    nr_free_pages 104822
+    nr_free_pages 117883
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089946
+    nr_free_pages 3353
+    nr_free_pages 104826
+    nr_free_pages 117883
+kswapd_low_wmark_hit_quickly 804
+pgmajfault 1089946
