@@ -1,6 +1,5 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/workqueue.h>
 #include <linux/slab.h>
 #include <linux/timer.h>
 #include <linux/migrate.h>
@@ -10,15 +9,9 @@
 
 MODULE_LICENSE("GPL");
 
-static struct workqueue_struct *my_wq;
 static struct timer_list my_timer;
-typedef struct {
-      struct work_struct my_work;
-        int    x;
-} my_work_t;
 struct timespec64 start_time;
 struct timespec64 end_time;
-my_work_t *work, *work2;
 void my_timer_callback(void);
 
 

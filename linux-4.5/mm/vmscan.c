@@ -2206,29 +2206,20 @@ static inline void init_tlb_ubc(void)
 unsigned int wakeup_migrate(void)
 {
  int nid=DRAM_NODE;
+ int p_nid=PRAM_NODE;
  int i=0,ret,iter=0;
- unsigned long length_inactive;
- struct zone* zone;
+ unsigned long length_inactive,pram_free_pages;
+ struct zone* zone, *pram_zone;
  struct page *page,*page2;
  enum lru_list lru=LRU_INACTIVE_ANON;
- int j;
- while ( iter < 2) {
- lru = lru + iter;
  LIST_HEAD(migrate_list); 
  INIT_LIST_HEAD(&migrate_list);
- zone = &NODE_DATA(nid)->node_zones[0];
- for (j=0; j < NODE_DATA(nid)->nr_zones; j++){
-  if(populated_zone(&NODE_DATA(nid)->node_zones[j])){
-    zone = &NODE_DATA(nid)->node_zones[j];
-  }
- }
+ zone = &NODE_DATA(nid)->node_zones[1];
+ pram_zone = &NODE_DATA(p_nid)->node_zones[1];
     struct list_head* inactive_head=&zone->lruvec.lists[lru];
-    //printk("Prashanth: Migrating anon pages\n");
-    //struct zoneref* z_ref=first_zones_zonelist(z_list,ZONE_NORMAL,NULL,&zone);
-    //printk("Prashanth:Number of zones in this node is %d\n",zone->zone_pgdat->nr_zones);
     length_inactive=zone_page_state(zone,NR_INACTIVE_ANON);
-    if(length_inactive < 15000) return 0;
-    local_irq_disable();
+    pram_free_pages=zone_page_state(pram_zone,NR_FREE_PAGES);
+    if(pram_free_pages < 20000 || length_inactive < 15000) return 0;
     printk("Prashanth: Length of inactive list is %lu\n",length_inactive);
     list_for_each_entry_safe_reverse(page2,page,inactive_head,lru) {
         if (i <= 10000){
@@ -2243,7 +2234,6 @@ unsigned int wakeup_migrate(void)
             break;
     }
     if ( i == 0){
-        local_irq_enable();
         return 0;
     }    
         //printk("Prashanth:Number of items is %d\n",i);
@@ -2253,18 +2243,11 @@ unsigned int wakeup_migrate(void)
                 ret=migrate_to_pram(&migrate_list,PRAM_ANON);
                 if(ret)
 			         putback_movable_pages(&migrate_list);
-
-                    //printk("Prashanth: Could not Migrate %d anon pages\n",ret);
                 break;
-        case LRU_INACTIVE_FILE:
-                ret=migrate_to_pram(&migrate_list,PRAM_FILE);
-                //printk("Prashanth: Could not migrate %d file pages\n",ret);
-            break;
         default:
                 break;
     }
  return (i -ret);
- local_irq_enable();
 }
 EXPORT_SYMBOL(wakeup_migrate);
  
